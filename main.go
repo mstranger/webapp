@@ -30,15 +30,12 @@ func notFound(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	r := mux.NewRouter()
-
-	r.NotFoundHandler = http.HandlerFunc(notFound)
-
+	// routes
 	r.HandleFunc("/", home)
 	r.HandleFunc("/contact", contact)
 	r.HandleFunc("/faq", faq)
+	// 404 page
+	r.NotFoundHandler = http.HandlerFunc(notFound)
 
 	http.ListenAndServe(":3000", r)
-
-	// http.HandleFunc("/", handlerFunc)
-	// http.ListenAndServe(":3000", nil)
 }
