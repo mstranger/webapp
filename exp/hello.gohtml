@@ -1,0 +1,10 @@
+<h1>Hello, {{.Name}}!</h1>
+<p>
+  My dog's name is {{.Dog.Name}}.
+</p>
+<p>
+  {{range .Slice}}
+    <b>Bold item</b>
+    {{.}}
+  {{end}}
+</p>
