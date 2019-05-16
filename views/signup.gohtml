@@ -1,5 +1,19 @@
 {{define "yield"}}
+ <div class="row">
+   <div class="col-md-6 offset-md-3">
+      <div class="card m-2" style="border-color: #428bca;">
+        <div class="card-header bg-primary text-white">
+          <h5 class="card-title">Sign Up Now!</h5>
+        </div>
+        <div class="card-body">
+          {{template "signupForm"}}
+        </div>
+      </div>
+   </div>
+ </div>
+{{end}}
 
+{{define "signupForm"}}
 <form>
   <div class="form-group">
     <label for="email">Email address</label>
@@ -9,7 +23,6 @@
     <label for="password">Password</label>
     <input type="password" name="password" class="form-control" id="password" placeholder="Password">
   </div>
-  <button type="submit" class="btn btn-primary">Sign Up</button>
+  <div class="form-group text-center"><button type="submit" class="btn btn-primary">Sign Up</button></div>
 </form>
-
 {{end}}
