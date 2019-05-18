@@ -21,7 +21,7 @@ type Users struct {
 	NewView *views.View
 }
 
-// This is used to render the form where a user can create
+// New is used to render the form where a user can create
 // a new user account.
 //
 // GET /signup
@@ -29,8 +29,8 @@ func (u *Users) New(w http.ResponseWriter, r *http.Request) {
 	u.NewView.Render(w, nil)
 }
 
-// This is used to precess the signup form with a user tries to
-// create a new user account.
+// Create is used to precess the signup form when a user
+// submits it. This is used to create a new user account.
 //
 // POST /signup
 func (u *Users) Create(w http.ResponseWriter, r *http.Request) {

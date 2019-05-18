@@ -71,8 +71,8 @@ func main() {
 		}
 	*/
 
-	r := mux.NewRouter()
 	// routes
+	r := mux.NewRouter()
 	r.HandleFunc("/", home).Methods("GET")
 	r.HandleFunc("/contact", contact).Methods("GET")
 	// r.HandleFunc("/signup", signup)
