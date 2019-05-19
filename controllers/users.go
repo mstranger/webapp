@@ -34,5 +34,12 @@ func (u *Users) New(w http.ResponseWriter, r *http.Request) {
 //
 // POST /signup
 func (u *Users) Create(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "This is a fake message. Pretend that we created the user account.")
+	if err := r.ParseForm(); err != nil {
+		panic(err)
+	}
+	// r.PostForm = map[string][]string
+	fmt.Fprintln(w, r.PostForm["email"])
+	// fmt.Fprintln(w, r.PostFormValue("email"))
+	fmt.Fprintln(w, r.PostForm["password"])
+	// fmt.Fprintln(w, r.PostFormValue("password"))
 }
