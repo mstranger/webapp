@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/gorilla/schema"
-
 	"../views"
 )
 
@@ -41,15 +39,19 @@ type SignupForm struct {
 //
 // POST /signup
 func (u *Users) Create(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseForm(); err != nil {
+	var form SignupForm
+	if err := parseForm(r, &form); err != nil {
 		panic(err)
 	}
 
-	dec := schema.NewDecoder()
-	var form SignupForm
-	if err := dec.Decode(&form, r.PostForm); err != nil {
-		panic(err)
-	}
+	// if err := r.ParseForm(); err != nil {
+	// 	panic(err)
+	// }
+
+	// dec := schema.NewDecoder()
+	// if err := dec.Decode(&form, r.PostForm); err != nil {
+	// 	panic(err)
+	// }
 
 	fmt.Fprintln(w, form)
 
