@@ -5,34 +5,33 @@ import (
 	"net/http"
 
 	"./controllers"
-	"./views"
 
 	"github.com/gorilla/mux"
 )
 
-var (
-	homeView    *views.View
-	contactView *views.View
-	// signupView  *views.View
-)
+// var (
+// 	homeView    *views.View
+// 	contactView *views.View
+//  signupView  *views.View
+// )
 
-func home(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
-	must(homeView.Render(w, nil))
-	// err := homeView.Template.ExecuteTemplate(w, homeView.Layout, nil)
-	// if err != nil {
-	// 	panic(err)
-	// }
-}
+// func home(w http.ResponseWriter, r *http.Request) {
+// 	w.Header().Set("Content-Type", "text/html")
+// 	must(homeView.Render(w, nil))
+// err := homeView.Template.ExecuteTemplate(w, homeView.Layout, nil)
+// if err != nil {
+// 	panic(err)
+// }
+// }
 
-func contact(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
-	must(contactView.Render(w, nil))
-	// err := contactView.Template.ExecuteTemplate(w, contactView.Layout, nil)
-	// if err != nil {
-	// 	panic(err)
-	// }
-}
+// func contact(w http.ResponseWriter, r *http.Request) {
+// 	w.Header().Set("Content-Type", "text/html")
+// 	must(contactView.Render(w, nil))
+// err := contactView.Template.ExecuteTemplate(w, contactView.Layout, nil)
+// if err != nil {
+// 	panic(err)
+// }
+// }
 
 // func signup(w http.ResponseWriter, r *http.Request) {
 // 	w.Header().Set("Content-Type", "text/html")
@@ -46,10 +45,11 @@ func notFound(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	homeView = views.NewView("bootstrap", "views/home.gohtml")
-	contactView = views.NewView("bootstrap", "views/contact.gohtml")
+	// homeView = views.NewView("bootstrap", "views/home.gohtml")
+	// contactView = views.NewView("bootstrap", "views/contact.gohtml")
 	// signupView = views.NewView("bootstrap", "views/signup.gohtml")
 
+	staticC := controllers.NewStatic()
 	usersC := controllers.NewUsers()
 
 	/*
@@ -73,8 +73,10 @@ func main() {
 
 	// routes
 	r := mux.NewRouter()
-	r.HandleFunc("/", home).Methods("GET")
-	r.HandleFunc("/contact", contact).Methods("GET")
+	r.Handle("/", staticC.Home).Methods("GET")
+	// r.HandleFunc("/", home).Methods("GET")
+	r.Handle("/contact", staticC.Contact).Methods("GET")
+	// r.HandleFunc("/contact", contact).Methods("GET")
 	// r.HandleFunc("/signup", signup)
 	r.HandleFunc("/signup", usersC.New).Methods("GET")
 	r.HandleFunc("/signup", usersC.Create).Methods("POST")
