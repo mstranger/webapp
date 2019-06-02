@@ -33,12 +33,23 @@ func main() {
 
 	defer db.Close()
 
-	_, err = db.Exec(`
+	// type User struct {
+	// 	ID int
+	// 	Name string
+	// 	Email string
+	// }
+
+	var id int
+	row := db.QueryRow(`
 		INSERT INTO users(name, email)
-		VALUES($1, $2)`, "John Doe", "john@mail.com")
+		VALUES($1, $2)
+		RETURNING id`,
+		"Mike Smith", "mike@mail.com")
+	err = row.Scan(&id)
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println("ID is...", id)
 
 	// err = db.Ping()
 	// if err != nil {
