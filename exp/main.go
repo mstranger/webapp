@@ -1,36 +1,50 @@
 package main
 
 import (
-	"html/template"
-	"os"
+	"database/sql"
+	"fmt"
+
+	_ "github.com/lib/pq"
 )
 
-type Dog struct {
-	Name string
-}
-
-type User struct {
-	Name  string
-	Dog   Dog
-	Slice []string
-}
+const (
+	host     = "localhost"
+	port     = 5432
+	user     = "mstranger"
+	password = "password"
+	dbname   = "webapp_dev"
+)
 
 func main() {
-	t, err := template.ParseFiles("hello.gohtml")
+	// var psqlInfo string
+
+	// if password == "" {
+
+	// } else {
+
+	// }
+
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+
+	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
 		panic(err)
 	}
 
-	data := User{
-		Name: "John Smith",
-		Dog: Dog{
-			Name: "Mortie",
-		},
-		Slice: []string{"a", "b", "c"},
-	}
+	defer db.Close()
 
-	err = t.Execute(os.Stdout, data)
+	_, err = db.Exec(`
+		INSERT INTO users(name, email)
+		VALUES($1, $2)`, "John Doe", "john@mail.com")
 	if err != nil {
 		panic(err)
 	}
+
+	// err = db.Ping()
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	// fmt.Println("Successfully connected!")
+	// db.Close()
 }
