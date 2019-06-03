@@ -33,13 +33,13 @@ func main() {
 
 	defer db.Close()
 
-	type User struct {
-		ID    int
-		Name  string
-		Email string
-	}
+	// type User struct {
+	// 	ID    int
+	// 	Name  string
+	// 	Email string
+	// }
 
-	var users []User
+	// var users []User
 
 	// var id int
 	// row := db.QueryRow(`
@@ -54,29 +54,53 @@ func main() {
 	// 	FROM users
 	// 	WHERE id=$1`, 3)
 
+	// for i := 1; i < 6; i++ {
+	// userID := 1
+	// if i > 3 {
+	// 	userID = 3
+	// }
+	// amount := i * 100
+	// description := fmt.Sprintf("USB-C Adapter x%d", i)
+
 	rows, err := db.Query(`
-		SELECT id, name, email
-		FROM users`)
+			SELECT *
+			FROM users
+			INNER JOIN orders ON users.id=orders.user_id`)
 
 	if err != nil {
 		panic(err)
 	}
 
-	defer rows.Close()
 	for rows.Next() {
-		var user User
-		err := rows.Scan(&user.ID, &user.Name, &user.Email)
-		if err != nil {
+		var userID, orderID, amount int
+		var email, name, desc string
+		if err := rows.Scan(&userID, &name, &email, &orderID, &userID, &amount, &desc); err != nil {
 			panic(err)
 		}
-		users = append(users, user)
+		fmt.Println("userID:", userID, "name:", name, "email:", email, "orderID:", orderID, "amount:", amount, "desc:", desc)
 	}
-
 	if rows.Err() != nil {
-		// handle the err
+		panic(rows.Err())
 	}
 
-	fmt.Println(users)
+	// }
+
+	// defer rows.Close()
+
+	// for rows.Next() {
+	// 	var user User
+	// 	err := rows.Scan(&user.ID, &user.Name, &user.Email)
+	// 	if err != nil {
+	// 		panic(err)
+	// 	}
+	// 	users = append(users, user)
+	// }
+
+	// if rows.Err() != nil {
+	// 	// handle the err
+	// }
+
+	// fmt.Println(users)
 
 	// err = db.Ping()
 	// if err != nil {
