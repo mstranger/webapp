@@ -19,6 +19,7 @@ type User struct {
 	gorm.Model
 	Name  string
 	Email string `gorm:"not null;unique_index"`
+	Color string
 }
 
 func main() {
@@ -32,10 +33,20 @@ func main() {
 
 	defer db.Close()
 
-	if err := db.DB().Ping(); err != nil {
-		panic(err)
-	}
+	db.LogMode(true)
+	db.AutoMigrate(&User{})
 
-	// db.AutoMigrate(&User{})
-	db.DropTableIfExists(&User{})
+	var u User
+	// newdb := db.Where("id = ? AND color = ?", 4, "red")
+	// newdb.First(&u)
+	db.Where("color = ?", "red").
+		Where("id > ?", 4).
+		First(&u)
+	// db.First(&u, "color = ?", "red")
+	fmt.Println(u)
+
+	var users []User
+	db.Find(&users)
+	fmt.Println(len(users))
+	fmt.Println(users)
 }
