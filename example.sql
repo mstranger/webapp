@@ -10,3 +10,6 @@ CREATE TABLE orders (
   amount INT,
   description TEXT
 );
+
+INSERT INTO users (name, email)
+VALUES ('john doe', 'john@mail.com');
