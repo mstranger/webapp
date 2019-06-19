@@ -1,0 +1,5 @@
+User Model:
+
+gorm.Model - id, created_at, updated_at, deleteted_at
+Name
+Email
