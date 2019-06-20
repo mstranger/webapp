@@ -29,6 +29,14 @@ func main() {
 
 	// us.DestructiveReset()
 
+	// user := models.User{
+	// 	Name:  "Michael Scott",
+	// 	Email: "michaelscott@mail.com",
+	// }
+	// if err := us.Create(&user); err != nil {
+	// 	panic(err)
+	// }
+
 	user, err := us.ByID(1)
 	if err != nil {
 		panic(err)
