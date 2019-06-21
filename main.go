@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"./controllers"
+	"./models"
 
 	"github.com/gorilla/mux"
 )
@@ -44,13 +45,29 @@ func notFound(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "<h1>Sorry, but we couldn't find the page you are looking for</h1>")
 }
 
+const (
+	host     = "localhost"
+	port     = 5432
+	user     = "mstranger"
+	password = "password"
+	dbname   = "webapp_dev"
+)
+
 func main() {
 	// homeView = views.NewView("bootstrap", "views/home.gohtml")
 	// contactView = views.NewView("bootstrap", "views/contact.gohtml")
 	// signupView = views.NewView("bootstrap", "views/signup.gohtml")
 
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+
+	us, err := models.NewUserService(psqlInfo)
+	must(err)
+
+	defer us.Close()
+	us.AutoMigrate()
+
 	staticC := controllers.NewStatic()
-	usersC := controllers.NewUsers()
+	usersC := controllers.NewUsers(us)
 
 	/*
 		var err error
@@ -84,6 +101,7 @@ func main() {
 	// 404 page
 	r.NotFoundHandler = http.HandlerFunc(notFound)
 
+	fmt.Println("Starting the server on :3000...")
 	http.ListenAndServe(":3000", r)
 }
 

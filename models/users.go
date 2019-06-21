@@ -93,9 +93,21 @@ func (us *UserService) Close() error {
 }
 
 // DestructiveReset drops the user table and rebuilds it
-func (us *UserService) DestructiveReset() {
-	us.db.DropTableIfExists(&User{})
-	us.db.AutoMigrate(&User{})
+func (us *UserService) DestructiveReset() error {
+	if err := us.db.DropTableIfExists(&User{}).Error; err != nil {
+		return err
+	}
+	return us.AutoMigrate()
+	// us.db.AutoMigrate(&User{})
+}
+
+// AutoMigrate will attempt to automatically migrate the
+// users table.
+func (us *UserService) AutoMigrate() error {
+	if err := us.db.DropTableIfExists(&User{}).Error; err != nil {
+		return err
+	}
+	return nil
 }
 
 type User struct {
