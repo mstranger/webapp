@@ -106,13 +106,13 @@ func (us *UserService) DestructiveReset() error {
 		return err
 	}
 	return us.AutoMigrate()
-	// us.db.AutoMigrate(&User{})
+	// return us.db.AutoMigrate(&User{})
 }
 
 // AutoMigrate will attempt to automatically migrate the
 // users table.
 func (us *UserService) AutoMigrate() error {
-	if err := us.db.DropTableIfExists(&User{}).Error; err != nil {
+	if err := us.db.AutoMigrate(&User{}).Error; err != nil {
 		return err
 	}
 	return nil
@@ -121,7 +121,7 @@ func (us *UserService) AutoMigrate() error {
 type User struct {
 	gorm.Model
 	Name         string
-	Email        string `gorm:"not null";unique_index"`
+	Email        string `gorm:"not null;unique_index"`
 	Password     string `gorm:"-"`
 	PasswordHash string `gorm:"not null"`
 }
