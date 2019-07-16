@@ -65,6 +65,7 @@ func main() {
 
 	defer us.Close()
 	us.AutoMigrate()
+	// reset the DB
 	// us.DestructiveReset()
 
 	staticC := controllers.NewStatic()
