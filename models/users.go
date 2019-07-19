@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"strings"
 
 	"../hash"
 	"../rand"
@@ -123,6 +124,18 @@ type userValidator struct {
 	hmac hash.HMAC
 }
 
+// ByEmail will normalize the email address before calling
+// ByEmail on the UserDB field.
+func (uv *userValidator) ByEmail(email string) (*User, error) {
+	user := User{
+		Email: email,
+	}
+	if err := runUserValFuncs(&user, uv.normalizeEmail); err != nil {
+		return nil, err
+	}
+	return uv.UserDB.ByEmail(user.Email)
+}
+
 // ByRemember will hash the remember token and than call
 // ByRemember on the subsequent UserDB layer.
 func (uv *userValidator) ByRemember(token string) (*User, error) {
@@ -156,7 +169,12 @@ func (uv *userValidator) Create(user *User) error {
 	// 	user.Remember = token
 	// }
 
-	err := runUserValFuncs(user, uv.bcryptPassword, uv.setRememberIfUnset, uv.hmacRemember)
+	err := runUserValFuncs(user,
+		uv.bcryptPassword,
+		uv.setRememberIfUnset,
+		uv.hmacRemember,
+		uv.normalizeEmail,
+		uv.requireEmail)
 	if err != nil {
 		return err
 	}
@@ -171,7 +189,11 @@ func (uv *userValidator) Update(user *User) error {
 	// if user.Remember != "" {
 	// 	user.RememberHash = uv.hmac.Hash(user.Remember)
 	// }
-	err := runUserValFuncs(user, uv.bcryptPassword, uv.hmacRemember)
+	err := runUserValFuncs(user,
+		uv.bcryptPassword,
+		uv.hmacRemember,
+		uv.normalizeEmail,
+		uv.requireEmail)
 	if err != nil {
 		return err
 	}
@@ -226,6 +248,19 @@ func (uv *userValidator) setRememberIfUnset(user *User) error {
 		return err
 	}
 	user.Remember = token
+	return nil
+}
+
+func (uv *userValidator) normalizeEmail(user *User) error {
+	user.Email = strings.ToLower(user.Email)
+	user.Email = strings.TrimSpace(user.Email)
+	return nil
+}
+
+func (uv *userValidator) requireEmail(user *User) error {
+	if user.Email == "" {
+		return errors.New("Email address is required")
+	}
 	return nil
 }
 
