@@ -107,10 +107,11 @@ func NewUserService(connectionInfo string) (UserService, error) {
 		return nil, err
 	}
 	hmac := hash.NewHMAC(hmacSecretKey)
-	uv := &userValidator{
-		hmac:   hmac,
-		UserDB: ug,
-	}
+	uv := newUserValidator(ug, hmac)
+	// uv := &userValidator{
+	// 	hmac:   hmac,
+	// 	UserDB: ug,
+	// }
 
 	return &userService{
 		UserDB: uv,
