@@ -42,6 +42,14 @@ var (
 	// emailRegex is used to match email addresses. It is not
 	// perfect but works well enough for now.
 	// emailRegex = regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,16}$`)
+
+	// ErrPasswordRequired is returned when a create is attempted
+	// without a user password provider.
+	ErrPasswordRequired = errors.New("models: password is required")
+
+	// ErrPasswordTooShort is returned when an update or create
+	// attempted with a user password that is less than 8 chars.
+	ErrPasswordTooShort = errors.New("models: password must be at least 8 chars long")
 )
 
 const userPwPepper = "secret-random-string"
@@ -197,7 +205,10 @@ func (uv *userValidator) Create(user *User) error {
 	// }
 
 	err := runUserValFuncs(user,
+		uv.passwordRequired,
+		uv.passwordMinLength,
 		uv.bcryptPassword,
+		uv.passwordHashRequired,
 		uv.setRememberIfUnset,
 		uv.hmacRemember,
 		uv.normalizeEmail,
@@ -219,7 +230,9 @@ func (uv *userValidator) Update(user *User) error {
 	// 	user.RememberHash = uv.hmac.Hash(user.Remember)
 	// }
 	err := runUserValFuncs(user,
+		uv.passwordMinLength,
 		uv.bcryptPassword,
+		uv.passwordHashRequired,
 		uv.hmacRemember,
 		uv.normalizeEmail,
 		uv.requireEmail,
@@ -333,6 +346,30 @@ func (uv *userValidator) idGreaterThan(n uint) userValFunc {
 		}
 		return nil
 	})
+}
+
+func (uv *userValidator) passwordMinLength(user *User) error {
+	if user.Password == "" {
+		return nil
+	}
+	if len(user.Password) < 8 {
+		return ErrPasswordTooShort
+	}
+	return nil
+}
+
+func (uv *userValidator) passwordRequired(user *User) error {
+	if user.Password == "" {
+		return ErrPasswordRequired
+	}
+	return nil
+}
+
+func (uv *userValidator) passwordHashRequired(user *User) error {
+	if user.PasswordHash == "" {
+		return ErrPasswordRequired
+	}
+	return nil
 }
 
 func newUserGorm(connectionInfo string) (*userGorm, error) {
