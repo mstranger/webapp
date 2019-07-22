@@ -32,13 +32,25 @@ type Users struct {
 //
 // GET /signup
 func (u *Users) New(w http.ResponseWriter, r *http.Request) {
-	u.NewView.Render(w, nil)
+	type Alert struct {
+		Level   string
+		Message string
+	}
+
+	a := Alert{
+		Level:   "success",
+		Message: "Successfully rendered a dynamic alert!",
+	}
+
+	if err := u.NewView.Render(w, a); err != nil {
+		panic(err)
+	}
 }
 
 type SignupForm struct {
 	Name     string `schema:"name"`
 	Email    string `schema:"email"`
-	Password string `schema: "password"`
+	Password string `schema:"password"`
 }
 
 // Create is used to precess the signup form when a user
