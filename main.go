@@ -64,8 +64,9 @@ func main() {
 	must(err)
 
 	// TODO: Fix this
-	// defer us.Close()
-	// us.AutoMigrate()
+	defer services.Close()
+	// services.DestructiveReset()
+	services.AutoMigrate()
 
 	// reset the DB
 	// us.DestructiveReset()
