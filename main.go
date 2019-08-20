@@ -73,6 +73,7 @@ func main() {
 
 	staticC := controllers.NewStatic()
 	usersC := controllers.NewUsers(services.User)
+	galleriesC := controllers.NewGalleries(services.Gallery)
 
 	/*
 		var err error
@@ -103,6 +104,9 @@ func main() {
 	r.Handle("/login", usersC.LoginView).Methods("GET")
 	r.HandleFunc("/login", usersC.Login).Methods("POST")
 	r.HandleFunc("/cookietest", usersC.CookieTest).Methods("GET")
+
+	// Gallery routes
+	r.Handle("/galleries/new", galleriesC.New).Methods("GET")
 
 	// 404 page
 	r.NotFoundHandler = http.HandlerFunc(notFound)
