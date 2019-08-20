@@ -107,6 +107,7 @@ func main() {
 
 	// Gallery routes
 	r.Handle("/galleries/new", galleriesC.New).Methods("GET")
+	r.HandleFunc("/galleries", galleriesC.Create).Methods("POST")
 
 	// 404 page
 	r.NotFoundHandler = http.HandlerFunc(notFound)
