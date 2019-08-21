@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"./controllers"
+	"./middleware"
 	"./models"
 
 	"github.com/gorilla/mux"
@@ -75,6 +76,10 @@ func main() {
 	usersC := controllers.NewUsers(services.User)
 	galleriesC := controllers.NewGalleries(services.Gallery)
 
+	requireUserMw := middleware.RequireUser{
+		UserService: services.User,
+	}
+
 	/*
 		var err error
 		homeTemplate, err = template.ParseFiles(
@@ -106,8 +111,10 @@ func main() {
 	r.HandleFunc("/cookietest", usersC.CookieTest).Methods("GET")
 
 	// Gallery routes
-	r.Handle("/galleries/new", galleriesC.New).Methods("GET")
-	r.HandleFunc("/galleries", galleriesC.Create).Methods("POST")
+	r.Handle("/galleries/new", requireUserMw.Apply(galleriesC.New)).Methods("GET")
+	r.HandleFunc("/galleries", requireUserMw.ApplyFn(galleriesC.Create)).Methods("POST")
+	// r.Handle("/galleries/new", galleriesC.New).Methods("GET")
+	// r.HandleFunc("/galleries", galleriesC.Create).Methods("POST")
 
 	// 404 page
 	r.NotFoundHandler = http.HandlerFunc(notFound)
