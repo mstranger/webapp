@@ -1,30 +1,81 @@
 {{define "yield"}}
-<div class="row">
-   <div class="col-md-8 offset-md-2">
-      <div class="card m-2" style="border-color: #428bca;">
-        <div class="card-header bg-primary text-white">
-          <h5 class="card-title">Edit your gallery</h5>
-        </div>
-        <div class="card-body">
-          {{template "editGalleryForm" .}}
-        </div>
-      </div>
-   </div>
- </div>
+<div class="row mt-2 ml-5">
+  <div class="offset-md-1 col-md-10">
+    <h2>Edit your gallery</h2>
+    <hr>
+  </div>
+</div>
+<div class="row ml-5">
+  <div class="col-md-12">
+    {{template "editGalleryForm"}}
+  </div>
+</div>
+<div class="row ml-5">
+  <div class="col-md-1">
+    <label class="">
+      Images
+    </label>
+  </div>
+  <div class="col-md-10">
+    {{template "galleryImages"}}
+  </div>
+</div>
+<div class="row ml-5">
+  <div class="col-md-12">
+    {{template "uploadImageForm"}}
+  </div>
+</div>
+<div class="row ml-5 mt-5">
+  <div class="col-md-12">
+    {{template "deleteGalleryForm" .}}
+  </div>
+</div>
 {{end}}
 
 {{define "editGalleryForm"}}
 <form action="/galleries/{{.ID}}/update" method="POST">
-  <div class="form-group">
-    <label for="title">Title</label>
-    <input type="text" name="title" class="form-control" id="title"
-      aria-describedby="emailHelp"
-      placeholder="What is the title of your gallery?"
-      value="{{.Title}}">
+  <div class="form-group row">
+    <label for="title" class="col-md-1 col-form-label">Title</label>
+    <div class="col-md-10">
+      <input type="text" name="title" class="form-control" id="title"
+        aria-describedby="emailHelp"
+        placeholder="What is the title of your gallery?"
+        value="{{.Title}}">
+    </div>
+    <div class="form-group text-center col-md-1">
+      <button type="submit" class="btn btn-primary">Save</button>
+    </div>
   </div>
-  <div class="form-group text-center"><button type="submit" class="btn btn-primary">Update</button></div>
 </form>
+{{end}}
+
+{{define "deleteGalleryForm"}}
+<h3>Dangerous buttons...</h3>
+<hr>
 <form action="/galleries/{{.ID}}/delete" method="POST">
-  <div class="form-group text-center"><button type="submit" class="btn btn-danger">Delete</button></div>
+  <div class="form-group">
+    <button type="submit" class="btn btn-danger">Delete</button>
+  </div>
 </form>
+{{end}}
+
+{{define "uploadImageForm"}}
+<form action="/galleries/{{.ID}}/images" method="POST" enctype="multipart/form-data">
+  <div class="form-group row">
+    <label for="images" class="col-md-1 col-form-label">Add images</label>
+    <div class="col-md-10">
+      <input type="file" multiple="multiple" class="form-control-file" id="images" name="images">
+      <small class="text-muted">
+        Please only use *.jpg, *.jpeg and *.png
+      </small>
+    </div>
+  </div>
+  <button type="submit" class="btn btn-outline-secondary">Upload</button>
+</form>
+{{end}}
+
+{{define "galleryImages"}}
+<div>
+  Comming soon...
+</div>
 {{end}}
