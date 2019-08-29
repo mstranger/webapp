@@ -17,7 +17,7 @@
     </label>
   </div>
   <div class="col-md-10">
-    {{template "galleryImages"}}
+    {{template "galleryImages" .}}
   </div>
 </div>
 <div class="row ml-5">
@@ -75,7 +75,11 @@
 {{end}}
 
 {{define "galleryImages"}}
-<div>
-  Comming soon...
-</div>
+<ul>
+  {{range .Images}}
+    <li>
+      {{.}}
+    </li>
+  {{end}}
+</ul>
 {{end}}
