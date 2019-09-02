@@ -7,38 +7,11 @@ import (
 	"./controllers"
 	"./middleware"
 	"./models"
+	"./rand"
 
+	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 )
-
-// var (
-// 	homeView    *views.View
-// 	contactView *views.View
-//  signupView  *views.View
-// )
-
-// func home(w http.ResponseWriter, r *http.Request) {
-// 	w.Header().Set("Content-Type", "text/html")
-// 	must(homeView.Render(w, nil))
-// err := homeView.Template.ExecuteTemplate(w, homeView.Layout, nil)
-// if err != nil {
-// 	panic(err)
-// }
-// }
-
-// func contact(w http.ResponseWriter, r *http.Request) {
-// 	w.Header().Set("Content-Type", "text/html")
-// 	must(contactView.Render(w, nil))
-// err := contactView.Template.ExecuteTemplate(w, contactView.Layout, nil)
-// if err != nil {
-// 	panic(err)
-// }
-// }
-
-// func signup(w http.ResponseWriter, r *http.Request) {
-// 	w.Header().Set("Content-Type", "text/html")
-// 	must(signupView.Render(w, nil))
-// }
 
 func notFound(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
@@ -55,53 +28,31 @@ const (
 )
 
 func main() {
-	// homeView = views.NewView("bootstrap", "views/home.gohtml")
-	// contactView = views.NewView("bootstrap", "views/contact.gohtml")
-	// signupView = views.NewView("bootstrap", "views/signup.gohtml")
-
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
 
 	services, err := models.NewServices(psqlInfo)
 	must(err)
 
-	// TODO: Fix this
 	defer services.Close()
 	// services.DestructiveReset()
 	services.AutoMigrate()
-
-	// reset the DB
-	// us.DestructiveReset()
 
 	r := mux.NewRouter()
 	staticC := controllers.NewStatic()
 	usersC := controllers.NewUsers(services.User)
 	galleriesC := controllers.NewGalleries(services.Gallery, services.Image, r)
 
+	// TODO: Update thi to be a config variable
+	isProd := false
+	b, err := rand.Bytes(32)
+	must(err)
+	csrfMw := csrf.Protect(b, csrf.Secure(isProd))
 	userMw := middleware.User{
 		UserService: services.User,
 	}
 	requireUserMw := middleware.RequireUser{
 		User: userMw,
 	}
-
-	/*
-		var err error
-		homeTemplate, err = template.ParseFiles(
-			"views/home.gohtml",
-			"views/layouts/footer.gohtml",
-		)
-		if err != nil {
-			panic(err)
-		}
-
-		contactTemplate, err = template.ParseFiles(
-			"views/contact.gohtml",
-			"views/layouts/footer.gohtml",
-		)
-		if err != nil {
-			panic(err)
-		}
-	*/
 
 	// routes
 	r.Handle("/", staticC.Home).Methods("GET")
@@ -139,7 +90,7 @@ func main() {
 	r.NotFoundHandler = http.HandlerFunc(notFound)
 
 	fmt.Println("Starting the server on :3000...")
-	http.ListenAndServe(":3000", userMw.Apply(r))
+	http.ListenAndServe(":3000", csrfMw(userMw.Apply(r)))
 }
 
 func must(err error) {
