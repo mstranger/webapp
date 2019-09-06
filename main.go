@@ -19,18 +19,10 @@ func notFound(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "<h1>Sorry, but we couldn't find the page you are looking for</h1>")
 }
 
-const (
-	host     = "localhost"
-	port     = 5432
-	user     = "mstranger"
-	password = "password"
-	dbname   = "webapp_dev"
-)
-
 func main() {
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
-
-	services, err := models.NewServices(psqlInfo)
+	cfg := DefaultConfig()
+	dbCfg := DefaultPostgresConfig()
+	services, err := models.NewServices(dbCfg.Dialect(), dbCfg.ConnetionInfo())
 	must(err)
 
 	defer services.Close()
@@ -42,11 +34,9 @@ func main() {
 	usersC := controllers.NewUsers(services.User)
 	galleriesC := controllers.NewGalleries(services.Gallery, services.Image, r)
 
-	// TODO: Update thi to be a config variable
-	isProd := false
 	b, err := rand.Bytes(32)
 	must(err)
-	csrfMw := csrf.Protect(b, csrf.Secure(isProd))
+	csrfMw := csrf.Protect(b, csrf.Secure(cfg.IsProd()))
 	userMw := middleware.User{
 		UserService: services.User,
 	}
@@ -89,8 +79,8 @@ func main() {
 	// 404 page
 	r.NotFoundHandler = http.HandlerFunc(notFound)
 
-	fmt.Println("Starting the server on :3000...")
-	http.ListenAndServe(":3000", csrfMw(userMw.Apply(r)))
+	fmt.Println("Starting the server on :%d...", cfg.Port)
+	http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), csrfMw(userMw.Apply(r)))
 }
 
 func must(err error) {

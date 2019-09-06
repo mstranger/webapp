@@ -8,11 +8,11 @@ import (
 	"../rand"
 
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
+// TODO: config this
 const userPwPepper = "secret-random-string"
 const hmacSecretKey = "secret-hmac-key"
 
