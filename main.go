@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"net/http"
 
@@ -20,8 +21,11 @@ func notFound(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	cfg := DefaultConfig()
-	dbCfg := DefaultPostgresConfig()
+	boolPtr := flag.Bool("prod", false, "Povide this flag in production. This ensures that a .config file is provided before the application starts.")
+	flag.Parse()
+
+	cfg := LoadConfig(*boolPtr)
+	dbCfg := cfg.Database
 	services, err := models.NewServices(
 		models.WithGorm(dbCfg.Dialect(), dbCfg.ConnetionInfo()),
 		models.WithLogMode(!cfg.IsProd()),
@@ -85,7 +89,7 @@ func main() {
 	// 404 page
 	r.NotFoundHandler = http.HandlerFunc(notFound)
 
-	fmt.Println("Starting the server on :%d...", cfg.Port)
+	fmt.Printf("Starting the server on :%d...", cfg.Port)
 	http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), csrfMw(userMw.Apply(r)))
 }
 
