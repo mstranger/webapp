@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"../context"
+	"../email"
 	"../models"
 	"../rand"
 	"../views"
@@ -15,11 +16,12 @@ import (
 // This function will panic if the templates are not
 // parsed correctly, and should only be used during
 // initial setup.
-func NewUsers(us models.UserService) *Users {
+func NewUsers(us models.UserService, emailer *email.Client) *Users {
 	return &Users{
 		NewView:   views.NewView("bootstrap", "users/new"),
 		LoginView: views.NewView("bootstrap", "users/login"),
 		us:        us,
+		emailer:   emailer,
 	}
 }
 
@@ -27,6 +29,7 @@ type Users struct {
 	NewView   *views.View
 	LoginView *views.View
 	us        models.UserService
+	emailer   *email.Client
 }
 
 // New is used to render the form where a user can create
@@ -109,6 +112,8 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request) {
 		// http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	u.emailer.Welcome(user.Name, user.Email)
 
 	err := u.signIn(w, &user)
 	if err != nil {

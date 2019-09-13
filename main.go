@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"./controllers"
+	"./email"
 	"./middleware"
 	"./models"
 	"./rand"
@@ -39,9 +40,15 @@ func main() {
 	// services.DestructiveReset()
 	services.AutoMigrate()
 
+	mgCfg := cfg.Mailgun
+	emailer := email.NewClient(
+		email.WithSender("website.com support", "support@sandboxd35fb954a4614a17b307669a656b0767"),
+		email.WithMailgun(mgCfg.Domain, mgCfg.APIKey),
+	)
+
 	r := mux.NewRouter()
 	staticC := controllers.NewStatic()
-	usersC := controllers.NewUsers(services.User)
+	usersC := controllers.NewUsers(services.User, emailer)
 	galleriesC := controllers.NewGalleries(services.Gallery, services.Image, r)
 
 	b, err := rand.Bytes(32)
