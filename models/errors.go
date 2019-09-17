@@ -26,6 +26,8 @@ const (
 	ErrPasswordTooShort modelError = "models: password must be at least 8 chars long"
 	ErrTitleRequired    modelError = "models: title is required"
 
+	ErrTokenInvalid modelError = "models: token provided is not valid"
+
 	// ErrInvalidID is returned when an invalid ID is provided
 	// to a method like Delete.
 	ErrInvalidID privateError = "models: ID provided was invalid"
