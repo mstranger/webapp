@@ -3,6 +3,7 @@ package email
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"time"
 
 	"github.com/mailgun/mailgun-go"
@@ -10,7 +11,10 @@ import (
 
 const (
 	welcomeSubject = "Welcome to website.com!"
-	welcomeText    = `Hi there!
+	resetSubject   = "Instructions for resetting your password."
+	resetBaseURL   = "https://www.example.com/reset"
+
+	welcomeText = `Hi there!
 
 	Welcome to Website.com! We really hope you enjoy using
 	our application!
@@ -29,6 +33,44 @@ const (
 	Name
 	`
 )
+
+const resetTextTmpl = `Hi there!
+
+It appears that you have have request a password reset.
+If this was you, please follow the link below to update
+your password:
+
+%s
+
+If you are asked for a token, please use the following value:
+
+%s
+
+If you didn't request a password reset you can safely ignore
+this email and your account will not be changed.
+
+Best,
+Name Support
+`
+
+const resetHTMLTmpl = `Hi there!<br>
+<br>
+It appears that you have have request a password reset.
+If this was you, please follow the link below to update
+your password:<br>
+<br>
+<a href="%s">%s</a><br>
+<br>
+If you are asked for a token, please use the following value:<br>
+<br>
+%s<br>
+<br>
+If you didn't request a password reset you can safely ignore
+this email and your account will not be changed.<br>
+<br>
+Best,<br>
+Name Support<br>
+`
 
 // func WithMailgun(domain, apiKey, publicKey string) ClientConfig {
 func WithMailgun(domain, apiKey string) ClientConfig {
@@ -71,6 +113,18 @@ func (c *Client) Welcome(toName, toEmail string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
+	_, _, err := c.mg.Send(ctx, message)
+	return err
+}
+
+func (c *Client) ResetPw(toEmail, token string) error {
+	v := url.Values{}
+	v.Set("token", token)
+	resetUrl := resetBaseURL + "?" + v.Encode()
+	resetText := fmt.Sprintf(resetTextTmpl, resetUrl, token)
+	message := c.mg.NewMessage(c.from, resetSubject, resetText, toEmail)
+	resetHTML := fmt.Sprintf(resetHTMLTmpl, resetUrl, resetUrl, token)
+	message.SetHtml(resetHTMLTmpl)
 	_, _, err := c.mg.Send(ctx, message)
 	return err
 }
