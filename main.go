@@ -26,6 +26,9 @@ func main() {
 	flag.Parse()
 
 	cfg := LoadConfig(*boolPtr)
+
+	// fmt.Println(cfg.Dropbox)
+
 	dbCfg := cfg.Database
 	services, err := models.NewServices(
 		models.WithGorm(dbCfg.Dialect(), dbCfg.ConnetionInfo()),
