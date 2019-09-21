@@ -32,7 +32,7 @@ func main() {
 
 	dbCfg := cfg.Database
 	services, err := models.NewServices(
-		models.WithGorm(dbCfg.Dialect(), dbCfg.ConnetionInfo()),
+		models.WithGorm(dbCfg.Dialect(), dbCfg.ConnectionInfo()),
 		models.WithLogMode(!cfg.IsProd()),
 		models.WithUser(cfg.Pepper, cfg.HMACKey),
 		models.WithGallery(),

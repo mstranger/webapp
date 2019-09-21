@@ -18,7 +18,7 @@ func (c PostgresConfig) Dialect() string {
 	return "postgres"
 }
 
-func (c PostgresConfig) ConnetionInfo() string {
+func (c PostgresConfig) ConnectionInfo() string {
 	if c.Password == "" {
 		return fmt.Sprintf("host=%s port=%d user=%s dbname=%s sslmode=disable",
 			c.Host, c.Port, c.User, c.Name)
