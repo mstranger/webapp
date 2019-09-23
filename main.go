@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"net/http"
+	"time"
 
 	"./controllers"
 	"./email"
@@ -37,12 +39,19 @@ func main() {
 		models.WithUser(cfg.Pepper, cfg.HMACKey),
 		models.WithGallery(),
 		models.WithImage(),
+		models.WithOAuth(),
 	)
 	must(err)
-
 	defer services.Close()
 	// services.DestructiveReset()
 	services.AutoMigrate()
+
+	_, err = services.OAuth.Find(1, "dropbox")
+	if err == nil {
+		panic("expected ErrNotFound")
+	} else {
+		fmt.Println("No OAuth tokens found!")
+	}
 
 	mgCfg := cfg.Mailgun
 	emailer := email.NewClient(
@@ -77,13 +86,38 @@ func main() {
 
 	dbxRedirect := func(w http.ResponseWriter, r *http.Request) {
 		state := csrf.Token(r)
+		cookie := http.Cookie{
+			Name:     "oauth_state",
+			Value:    state,
+			HttpOnly: true,
+		}
+		http.SetCookie(w, &cookie)
 		url := dbxOAuth.AuthCodeURL(state)
-		fmt.Println(state)
 		http.Redirect(w, r, url, http.StatusFound)
 	}
 	r.HandleFunc("/oauth/dropbox/connect", dbxRedirect)
 	dbxCallback := func(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
+		state := r.FormValue("state")
+		cookie, err := r.Cookie("oauth_state")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		} else if cookie == nil || cookie.Value != state {
+			http.Error(w, "Invalid state provided", http.StatusBadRequest)
+			return
+		}
+		cookie.Value = ""
+		cookie.Expires = time.Now()
+		http.SetCookie(w, cookie)
+
+		code := r.FormValue("code")
+		token, err := dbxOAuth.Exchange(context.TODO(), code)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		fmt.Fprintf(w, "%+v", token)
 		fmt.Fprintln(w, r.FormValue("code"), " state: ", r.FormValue("state"))
 	}
 	r.HandleFunc("/oauth/dropbox/callback", dbxCallback)
