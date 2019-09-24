@@ -22,8 +22,10 @@
     </ul>
     <ul class="navbar-nav">
       {{if .User}}
-        <li><a href="/oauth/dropbox/connect">Connect Dropbox</a></li>
-        <li>{{template "logoutForm"}}</li>
+        <li class="nav-item">
+          <a class="nav-link" href="/oauth/dropbox/connect">Connect Dropbox</a>
+        </li>
+        <li class="nav-item">{{template "logoutForm"}}</li>
       {{else}}
         <li class="nav-item">
           <a href="/login" class="nav-link">Log In</a>
