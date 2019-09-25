@@ -62,10 +62,6 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request) {
 	vd.Yield = &form
 	if err := parseForm(r, &form); err != nil {
 		log.Println(err)
-		// vd.Alert = &views.Alert{
-		// 	Level:   views.AlertLvlError,
-		// 	Message: views.AlertMsgGeneric,
-		// }
 		vd.SetAlert(err)
 		u.NewView.Render(w, r, vd)
 		return
@@ -78,13 +74,8 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := u.us.Create(&user); err != nil {
-		// vd.Alert = &views.Alert{
-		// 	Level:   views.AlertLvlError,
-		// 	Message: err.Error(),
-		// }
 		vd.SetAlert(err)
 		u.NewView.Render(w, r, vd)
-		// http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -93,7 +84,6 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request) {
 	err := u.signIn(w, &user)
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusFound)
-		// http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -135,12 +125,6 @@ func (u *Users) Login(w http.ResponseWriter, r *http.Request) {
 		u.LoginView.Render(w, r, vd)
 		return
 	}
-
-	// cookie := http.Cookie{
-	// 	Name:  "email",
-	// 	Value: user.Email,
-	// }
-	// http.SetCookie(w, &cookie)
 
 	err = u.signIn(w, user)
 	if err != nil {
@@ -280,8 +264,8 @@ func (u *Users) signIn(w http.ResponseWriter, user *models.User) error {
 	return nil
 }
 
-// CookieTest is used to display cookies set on the current user
 /*
+// CookieTest is used to display cookies set on the current user
 	func (u *Users) CookieTest(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("remember_token")
 		if err != nil {

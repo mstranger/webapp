@@ -197,22 +197,6 @@ func (uv *userValidator) ByRemember(token string) (*User, error) {
 // Create will create the provided user and backfill data
 // like the ID, CreatedAt, and UpdatedAt fields.
 func (uv *userValidator) Create(user *User) error {
-	// pwBytes := []byte(user.Password + userPwPepper)
-	// hashedBytes, err := bcrypt.GenerateFromPassword(pwBytes, bcrypt.DefaultCost)
-	// if err != nil {
-	// 	return err
-	// }
-	// user.PasswordHash = string(hashedBytes)
-	// user.Password = ""
-
-	// if user.Remember == "" {
-	// 	token, err := rand.RememberToken()
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// 	user.Remember = token
-	// }
-
 	err := runUserValFuncs(user,
 		uv.passwordRequired,
 		uv.passwordMinLength,
@@ -230,16 +214,11 @@ func (uv *userValidator) Create(user *User) error {
 		return err
 	}
 
-	// user.RememberHash = uv.hmac.Hash(user.Remember)
-
 	return uv.UserDB.Create(user)
 }
 
 // Update will hash a remember token if it is provided.
 func (uv *userValidator) Update(user *User) error {
-	// if user.Remember != "" {
-	// 	user.RememberHash = uv.hmac.Hash(user.Remember)
-	// }
 	err := runUserValFuncs(user,
 		uv.passwordMinLength,
 		uv.bcryptPassword,
@@ -413,7 +392,6 @@ func newUserGorm(connectionInfo string) (*userGorm, error) {
 	}
 
 	db.LogMode(true)
-	// hmac := hash.NewHMAC(hmacSecretKey)
 	return &userGorm{
 		db: db,
 	}, nil
@@ -493,23 +471,6 @@ func (us *userService) Authenticate(email, password string) (*User, error) {
 // Create will create the provided user and backfill data
 // like the ID, CreatedAt, and UpdatedAt fields.
 func (ug *userGorm) Create(user *User) error {
-	// pwBytes := []byte(user.Password + userPwPepper)
-	// hashedBytes, err := bcrypt.GenerateFromPassword(pwBytes, bcrypt.DefaultCost)
-	// if err != nil {
-	// 	return err
-	// }
-	// user.PasswordHash = string(hashedBytes)
-	// user.Password = ""
-
-	// if user.Remember == "" {
-	// 	token, err := rand.RememberToken()
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// 	user.Remember = token
-	// }
-	// user.RememberHash = ug.hmac.Hash(user.Remember)
-
 	return ug.db.Create(user).Error
 }
 
@@ -521,9 +482,6 @@ func (ug *userGorm) Update(user *User) error {
 
 // Delete will delete the user with the provided ID.
 func (ug *userGorm) Delete(id uint) error {
-	// if id == 0 {
-	// 	return ErrInvalidID
-	// }
 	user := User{Model: gorm.Model{ID: id}}
 	return ug.db.Delete(&user).Error
 }

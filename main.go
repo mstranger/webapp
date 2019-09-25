@@ -28,8 +28,6 @@ func main() {
 
 	cfg := LoadConfig(*boolPtr)
 
-	// fmt.Println(cfg.Dropbox)
-
 	dbCfg := cfg.Database
 	services, err := models.NewServices(
 		models.WithGorm(dbCfg.Dialect(), dbCfg.ConnectionInfo()),
@@ -44,16 +42,9 @@ func main() {
 	// services.DestructiveReset()
 	services.AutoMigrate()
 
-	// _, err = services.OAuth.Find(1, "dropbox")
-	// if err == nil {
-	// 	panic("expected ErrNotFound")
-	// } else {
-	// 	fmt.Println("No OAuth tokens found!")
-	// }
-
 	mgCfg := cfg.Mailgun
 	emailer := email.NewClient(
-		email.WithSender("website.com support", "support@sandboxd35fb954a4614a17b307669a656b0767"),
+		email.WithSender("website.com support", "support@domain.mail.com"),
 		email.WithMailgun(mgCfg.Domain, mgCfg.APIKey),
 	)
 
@@ -87,7 +78,6 @@ func main() {
 	// routes
 	r.Handle("/", staticC.Home).Methods("GET")
 	r.Handle("/contact", staticC.Contact).Methods("GET")
-	// r.Handle("/signup", usersC.NewView).Methods("GET")
 	r.HandleFunc("/signup", usersC.New).Methods("GET")
 	r.HandleFunc("/signup", usersC.Create).Methods("POST")
 	r.Handle("/login", usersC.LoginView).Methods("GET")
@@ -123,8 +113,6 @@ func main() {
 	r.HandleFunc("/galleries/{id:[0-9]+}/images", requireUserMw.ApplyFn(galleriesC.ImageUpload)).Methods("POST")
 	r.HandleFunc("/galleries/{id:[0-9]+}/images/{filename}/delete", requireUserMw.ApplyFn(galleriesC.ImageDelete)).Methods("POST")
 	r.HandleFunc("/galleries/{id:[0-9]+}/delete", requireUserMw.ApplyFn(galleriesC.Delete)).Methods("POST")
-	// r.Handle("/galleries/new", galleriesC.New).Methods("GET")
-	// r.HandleFunc("/galleries", galleriesC.Create).Methods("POST")
 
 	// 404 page
 	r.NotFoundHandler = http.HandlerFunc(notFound)

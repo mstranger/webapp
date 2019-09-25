@@ -75,7 +75,6 @@ Name Support<br>
 // func WithMailgun(domain, apiKey, publicKey string) ClientConfig {
 func WithMailgun(domain, apiKey string) ClientConfig {
 	return func(c *Client) {
-		// mg := mailgun.NewMailgun(domain, apiKey, publicKey)
 		mg := mailgun.NewMailgun(domain, apiKey)
 		c.mg = mg
 	}

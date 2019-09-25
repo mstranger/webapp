@@ -190,7 +190,6 @@ func (g *Galleries) ImageUpload(w http.ResponseWriter, r *http.Request) {
 }
 
 // POST /galleries/:id/images/:filename/delete
-//   data:
 func (g *Galleries) ImageDelete(w http.ResponseWriter, r *http.Request) {
 	gallery, err := g.galleryByID(w, r)
 	if err != nil {
@@ -260,11 +259,6 @@ func (g *Galleries) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := context.User(r.Context())
-	// if user == nil {
-	// 	http.Redirect(w, r, "/login", http.StatusFound)
-	// 	return
-	// }
-	// fmt.Println("Create got the user: ", user)
 
 	gallery := models.Gallery{
 		Title:  form.Title,
